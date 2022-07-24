@@ -58,11 +58,13 @@
       # - "3000"
       # - "5000"
       # - "9090"
-    # firewall_additional_rules:
+    firewall_additional_rules:
     #  - "iptables -A OUTPUT -d 192.168.12.0/24 -j ACCEPT"
     #  - "iptables -A INPUT --proto icmp -d 192.168.0.0/16,172.16.0.0/16,10.0.0.0/8 -j DROP"
     #  - "iptables -A OUTPUT -d 192.168.0.0/16,10.0.0.0/8 -j DROP"
     #  - "iptables -P INPUT DROP"
+      - iptables -A FORWARD -i tailscale0 -j ACCEPT
+      - iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
   roles:
     - geerlingguy.clamav
     - geerlingguy.security
