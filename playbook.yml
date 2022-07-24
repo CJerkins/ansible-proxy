@@ -1,0 +1,70 @@
+- hosts: localhost
+  connection: local
+  become: true
+  tasks:
+  - name: "Update repositories cache Ubuntu"
+    apt:
+      update_cache: yes
+    when: ansible_facts['os_family'] == "Debian"
+  - name: "Update repositories cache Ubuntu"
+    apt:
+      upgrade: true
+      state: latest
+    when: 
+      - ansible_facts['os_family'] == "Debian"
+
+  - name: Install apt packages
+    ansible.builtin.package:
+      name:
+        - vim
+        - git
+        - apt-transport-https
+        - curl
+        - iptables-persistent
+        - wget
+        - htop
+        - software-properties-common
+        - neofetch
+        - tmux
+        - nload
+        - autossh
+      state: latest
+
+  # Set ip forwarding on in /proc and verify token value with the sysctl command
+  - name: ip forwarding
+    ansible.posix.sysctl:
+      name: net.ipv4.ip_forward
+      value: '1'
+      sysctl_set: yes
+
+- hosts: localhost
+  connection: local
+  become: true
+  vars:
+    swap_file_size_mb: '8192'
+    security_sudoers_passworded: ### this is breaking the user password
+     - drok
+    security_autoupdate_mail_to: "6570"
+    security_autoupdate_mail_on_error: true
+    security_ssh_port: 2329
+    firewall_disable_ufw: true
+    firewall_disable_firewalld: true
+    firewall_flush_rules_and_chains: true
+    firewall_allowed_tcp_ports:
+      - "2329"
+      # - "89"
+      # - "12798"
+      # - "9091"
+      # - "3000"
+      # - "5000"
+      # - "9090"
+    # firewall_additional_rules:
+    #  - "iptables -A OUTPUT -d 192.168.12.0/24 -j ACCEPT"
+    #  - "iptables -A INPUT --proto icmp -d 192.168.0.0/16,172.16.0.0/16,10.0.0.0/8 -j DROP"
+    #  - "iptables -A OUTPUT -d 192.168.0.0/16,10.0.0.0/8 -j DROP"
+    #  - "iptables -P INPUT DROP"
+  roles:
+    - geerlingguy.clamav
+    - geerlingguy.security
+    - geerlingguy.firewall
+
